@@ -3,48 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning Agent - Step-by-Step Learning</title>
-    <style>
+    <title>🤖 AI Learning Assistant - Interactive Learning Hub</title>
+    
+    <!-- Enhanced Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <style>
+        /* Professional Color Scheme Variables */
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #10b981;
+            --accent: #f59e0b;
+            --surface: #ffffff;
+            --surface-secondary: #f8fafc;
+            --surface-dark: #1e293b;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --shadow-lg: rgba(0, 0, 0, 0.15);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
         }
 
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+        /* Enhanced Handwriting Animations */
+        @keyframes typewriter {
+            0% {
+                opacity: 0;
+                transform: scale(0.9) translateY(5px);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.02) translateY(-2px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
 
+        @keyframes fadeInSmooth {
+            0% {
+                opacity: 0;
+                transform: translateY(-3px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }        /* Main Container */
         .container {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             padding: 20px;
+            gap: 20px;
+            animation: slideInUp 0.8s ease-out;
         }
 
-        h1 {
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
+        /* Question Input Section - Separate at top */
+        .question-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 25px 30px;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            animation: slideInUp 0.6s ease-out;
         }
 
+        /* Canvas Section - Separate below */
+        .canvas-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+            flex: 1;
+            overflow: hidden;
+            animation: slideInUp 0.8s ease-out 0.2s both;
+        }        /* Canvas/Display Area */
         .canvas {
-            width: 80%;
-            height: 60vh;
-            background-color: #e0e0e0;
-            margin-bottom: 20px;
+            height: 500px;
             overflow-y: auto;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            font-size: 16px;
-            line-height: 1.5;
+            padding: 30px;
+            background: var(--surface);
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #666;
+            color: var(--text-muted);
+            font-size: 1.1rem;
         }
 
         .canvas.has-content {
@@ -53,99 +142,342 @@
             justify-content: unset;
         }
 
+        .canvas::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .canvas::-webkit-scrollbar-track {
+            background: var(--surface-secondary);
+            border-radius: 10px;
+        }
+
+        .canvas::-webkit-scrollbar-thumb {
+            background: var(--text-muted);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .canvas::-webkit-scrollbar-thumb:hover {
+            background: var(--text-secondary);
+        }
+
+        /* Input Section - Now standalone */
+        .input-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .input-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
         #questionInput {
-            width: 80%;
-            padding: 10px;
-            font-size: 16px;
-            border: 2px solid #ddd;
-            border-radius: 4px;
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 50px;
             outline: none;
-            transition: border-color 0.3s;
+            background: var(--surface);
+            color: var(--text-primary);
+            transition: var(--transition);
+            font-family: 'Inter', sans-serif;
         }
 
         #questionInput:focus {
-            border-color: #4CAF50;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            transform: translateY(-2px);
         }
 
-        button {
-            padding: 10px 20px;
-            margin-top: 10px;
-            font-size: 16px;
-            background-color: #4CAF50;
+        #questionInput::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            transition: var(--transition);
+        }
+
+        #questionInput:focus + .input-icon {
+            color: var(--primary);
+        }
+
+        /* Submit Button */
+        #submitBtn {
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: var(--gradient-primary);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
         }
 
-        button:hover {
-            background-color: #45a049;
+        #submitBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
         }
 
-        button:disabled {
-            background-color: #cccccc;
+        #submitBtn:active {
+            transform: translateY(0);
+        }
+
+        #submitBtn:disabled {
+            background: var(--text-muted);
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #submitBtn.processing {
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Handwriting Styles */
+        .handwriting {
+            font-family: 'Caveat', cursive;
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.8;
+            word-spacing: 3px;
+        }
+
+        .handwriting-word {
+            display: inline;
+            opacity: 0;
+            margin-right: 8px;
+            animation: fadeInSmooth 0.4s ease-out forwards;
+        }
+
+        .step-number.handwriting {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 26px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        .handwriting-char {
+            display: inline;
+            opacity: 0;
+            animation: typewriter 0.2s ease-out forwards;
         }
 
         .step-text {
-            margin-bottom: 15px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--surface-secondary);
+            border-radius: 15px;
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
         }
 
-        .step-number {
-            font-weight: bold;
-            color: #4CAF50;
+        .step-text:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px var(--shadow);
         }
+
+        /* Loading Animation */
+        .loading-dots {
+            display: inline-block;
+        }
+
+        .loading-dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary);
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% {
+                transform: scale(0);
+            }
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 2.2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .canvas {
+                height: 400px;
+                padding: 20px;
+            }
+
+            .input-section {
+                padding: 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            #submitBtn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .handwriting {
+                font-size: 20px;
+            }
+
+            .step-number.handwriting {
+                font-size: 22px;
+            }
+        }
+
+        /* Success/Error States */
+        .success-message {
+            color: var(--secondary);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--secondary);
+            margin: 10px 0;
+        }
+
+        .error-message {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ef4444;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .mb-20 { margin-bottom: 20px; }
+        .mt-15 { margin-top: 15px; }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>🤖 Learning Agent</h1>
-        <p style="margin-bottom: 20px; text-align: center; color: #666;">
-            Ask any question and get step-by-step explanations!
-        </p>
-        
-        <div class="canvas" id="canvas">
-            Canvas - Ready for your questions!
+<body>    <div class="container">
+        <!-- Canvas Section -->
+        <div class="canvas-section">
+            <div class="canvas" id="canvas">
+                <div class="text-center">
+                    <i class="fas fa-comments" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 20px;"></i>
+                    <p>Ready to help you learn! Ask me anything...</p>
+                    <small>Try: "Solve 2x + 5 = 13" or "How does photosynthesis work?"</small>
+                </div>
+            </div>
         </div>
         
-        <input type="text" id="questionInput" placeholder="Ask anything (e.g., How does photosynthesis work?)" />
-        <button onclick="submitQuestion()" id="submitBtn">Submit</button>
+        <!-- Question Input Section -->
+        <div class="question-section">
+            <div class="input-section">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="questionInput" 
+                        placeholder="Ask anything... (e.g., How to solve quadratic equations?)"
+                        autocomplete="off"
+                    />
+                    <i class="fas fa-search input-icon"></i>
+                </div>
+                <button id="submitBtn" onclick="submitQuestion()">
+                    <i class="fas fa-paper-plane"></i>
+                    <span class="btn-text">Ask</span>
+                </button>
+            </div>
+        </div>
         
-        <p style="margin-top: 15px; font-size: 12px; color: #888; text-align: center;">
-            Press Enter in the input field or click Submit to ask your question
-        </p>
-    </div>
-
-    <script>
-        // Add Enter key support for input field
-        document.getElementById('questionInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                submitQuestion();
-            }
+        <!-- Hint Text -->
+        <div class="text-center" style="color: var(--text-muted); font-size: 0.9rem;">
+            <i class="fas fa-keyboard"></i> Press Enter to submit • <i class="fas fa-magic"></i> Powered by AI
+        </div>
+    </div><script>
+        // Enhanced user interaction handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionInput = document.getElementById('questionInput');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Auto-focus input on load
+            questionInput.focus();
+            
+            // Enhanced Enter key support
+            questionInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    submitQuestion();
+                }
+            });
+            
+            // Real-time input validation and button state
+            questionInput.addEventListener('input', function() {
+                const hasText = this.value.trim().length > 0;
+                submitBtn.disabled = !hasText;
+                submitBtn.style.opacity = hasText ? '1' : '0.6';
+            });
+            
+            // Initial button state
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.6';
         });
 
-        // Main function to submit question
+        // Enhanced submit function with better UX
         async function submitQuestion() {
             const questionInput = document.getElementById('questionInput');
             const canvas = document.getElementById('canvas');
             const submitBtn = document.getElementById('submitBtn');
+            const btnText = submitBtn.querySelector('.btn-text');
+            const btnIcon = submitBtn.querySelector('i');
             const question = questionInput.value.trim();
 
             // Validate input
             if (!question) {
-                alert('Please enter a question!');
+                showErrorMessage('Please enter a question first!');
+                questionInput.focus();
                 return;
             }
 
-            // Disable button and show processing
+            // Enhanced loading state
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Processing...';
+            submitBtn.classList.add('processing');
+            btnText.textContent = 'Thinking';
+            btnIcon.className = 'fas fa-spinner fa-spin';
             
-            // Clear canvas and show processing message
+            // Clear canvas with smooth animation
             canvas.innerHTML = '';
             canvas.classList.add('has-content');
-            canvas.innerHTML = '<div style="text-align: center; color: #666;">🤔 Processing your question...</div>';
+            
+            // Show enhanced processing message
+            showProcessingMessage(canvas);
 
             try {
                 // Send request to backend
@@ -158,7 +490,7 @@
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`Server error: ${response.status} - ${response.statusText}`);
                 }
 
                 const data = await response.json();
@@ -167,77 +499,205 @@
                     throw new Error(data.error);
                 }
 
-                // Display steps
+                // Display steps with enhanced animation
                 await displaySteps(data.steps);
 
             } catch (error) {
                 console.error('Error:', error);
-                canvas.innerHTML = '<div style="color: #e74c3c; text-align: center;">❌ Error fetching answer: ' + error.message + '</div>';
+                showErrorMessage(canvas, error.message);
             } finally {
-                // Re-enable button
+                // Reset button state
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Submit';
-                questionInput.value = ''; // Clear input
+                submitBtn.classList.remove('processing');
+                btnText.textContent = 'Ask';
+                btnIcon.className = 'fas fa-paper-plane';
+                questionInput.value = '';
+                questionInput.focus();
             }
         }
 
-        // Function to display all steps with delays
+        // Enhanced processing message
+        function showProcessingMessage(canvas) {
+            canvas.innerHTML = `
+                <div class="text-center" style="padding: 40px;">
+                    <i class="fas fa-brain" style="font-size: 3rem; color: var(--primary); margin-bottom: 20px; animation: pulse 2s infinite;"></i>
+                    <h3 style="color: var(--text-primary); margin-bottom: 15px;">Analyzing your question...</h3>
+                    <div class="loading-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <p style="color: var(--text-secondary); margin-top: 15px;">Preparing step-by-step explanation</p>
+                </div>
+            `;
+        }
+
+        // Enhanced error display
+        function showErrorMessage(canvas, message) {
+            canvas.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 15px;"></i>
+                    <h3>Oops! Something went wrong</h3>
+                    <p><strong>Error:</strong> ${message}</p>
+                    <div style="margin-top: 20px;">
+                        <p><strong>💡 Suggestions:</strong></p>
+                        <ul style="text-align: left; margin-top: 10px;">
+                            <li>Check if the server is running</li>
+                            <li>Verify your internet connection</li>
+                            <li>Try asking a different question</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Enhanced step display function
         async function displaySteps(steps) {
             const canvas = document.getElementById('canvas');
-            canvas.innerHTML = ''; // Clear canvas
+            canvas.innerHTML = '';
             
+            // Add welcome message
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'text-center mb-20';
+            welcomeDiv.innerHTML = `
+                <i class="fas fa-check-circle" style="color: var(--secondary); font-size: 2rem; margin-bottom: 15px;"></i>
+                <h3 style="color: var(--text-primary);">Here's your step-by-step explanation:</h3>
+            `;
+            canvas.appendChild(welcomeDiv);
+            
+            // Display each step
             for (let i = 0; i < steps.length; i++) {
                 await displayStepChunkByChunk(steps[i], i);
                 
-                // Wait 2 seconds before next step (except for the last step)
+                // Progressive delay - longer pauses for complex explanations
                 if (i < steps.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                }
+            }
+            
+            // Add completion message
+            const completionDiv = document.createElement('div');
+            completionDiv.className = 'text-center mt-15';
+            completionDiv.innerHTML = `
+                <div style="padding: 20px; background: var(--surface-secondary); border-radius: 15px; margin-top: 30px;">
+                    <i class="fas fa-graduation-cap" style="color: var(--secondary); font-size: 1.5rem; margin-right: 10px;"></i>
+                    <span style="color: var(--text-primary); font-weight: 600;">Explanation complete! Ask me another question.</span>
+                </div>
+            `;
+            canvas.appendChild(completionDiv);
+        }
+
+        // Enhanced step animation with better visual feedback
+        async function displayStepChunkByChunk(step, stepIndex) {
+            const canvas = document.getElementById('canvas');
+            
+            // Create enhanced step container
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'step-text handwriting';
+            stepDiv.style.opacity = '0';
+            stepDiv.style.transform = 'translateY(20px)';
+            canvas.appendChild(stepDiv);
+
+            // Animate step appearance
+            setTimeout(() => {
+                stepDiv.style.transition = 'all 0.5s ease-out';
+                stepDiv.style.opacity = '1';
+                stepDiv.style.transform = 'translateY(0)';
+            }, 100);
+
+            // Add enhanced step number
+            const stepNumber = document.createElement('span');
+            stepNumber.className = 'step-number handwriting';
+            stepNumber.innerHTML = `<i class="fas fa-arrow-right" style="margin-right: 10px;"></i>Step ${stepIndex + 1}: `;
+            stepDiv.appendChild(stepNumber);
+
+            // Create container for content
+            const contentSpan = document.createElement('span');
+            stepDiv.appendChild(contentSpan);
+
+            // Enhanced character-by-character animation
+            await animateTextCharacterByCharacter(contentSpan, step);
+
+            // Add spacing
+            const lineBreak = document.createElement('br');
+            stepDiv.appendChild(lineBreak);
+            
+            // Smooth scroll
+            canvas.scrollTo({
+                top: canvas.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
+        // Enhanced character animation with natural variation
+        async function animateTextCharacterByCharacter(container, text) {
+            const words = text.split(' ');
+            
+            for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
+                const word = words[wordIndex];
+                
+                // Create word container
+                const wordSpan = document.createElement('span');
+                wordSpan.className = 'handwriting-word';
+                wordSpan.style.opacity = '1';
+                container.appendChild(wordSpan);
+                
+                // Animate each character with natural variation
+                for (let charIndex = 0; charIndex < word.length; charIndex++) {
+                    const char = word[charIndex];
+                    const charSpan = document.createElement('span');
+                    charSpan.className = 'handwriting-char';
+                    charSpan.textContent = char;
+                    charSpan.style.animationDelay = `${charIndex * 0.03}s`;
+                    wordSpan.appendChild(charSpan);
+                    
+                    // Natural variation in timing
+                    const baseDelay = 40;
+                    const variation = Math.random() * 30;
+                    await new Promise(resolve => setTimeout(resolve, baseDelay + variation));
+                    
+                    // Smooth auto-scroll
+                    container.parentElement.parentElement.scrollTo({
+                        top: container.parentElement.parentElement.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+                
+                // Add natural space between words
+                if (wordIndex < words.length - 1) {
+                    const spaceSpan = document.createElement('span');
+                    spaceSpan.textContent = ' ';
+                    spaceSpan.style.opacity = '1';
+                    container.appendChild(spaceSpan);
+                    
+                    // Slight pause between words
+                    await new Promise(resolve => setTimeout(resolve, 80 + Math.random() * 40));
                 }
             }
         }
 
-        // Function to display a single step chunk by chunk
-        async function displayStepChunkByChunk(step, stepIndex) {
-            const canvas = document.getElementById('canvas');
-            
-            // Create step container
-            const stepDiv = document.createElement('div');
-            stepDiv.className = 'step-text';
-            canvas.appendChild(stepDiv);
-
-            // Add step number prefix
-            const stepNumber = document.createElement('span');
-            stepNumber.className = 'step-number';
-            stepNumber.textContent = `Step ${stepIndex + 1}: `;
-            stepDiv.appendChild(stepNumber);
-
-            // Split step into words
-            const words = step.split(' ');
-            
-            // Display each word with delay
-            for (let i = 0; i < words.length; i++) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                
-                const wordSpan = document.createElement('span');
-                wordSpan.textContent = words[i] + (i < words.length - 1 ? ' ' : '');
-                stepDiv.appendChild(wordSpan);
-                
-                // Auto-scroll to bottom
-                canvas.scrollTop = canvas.scrollHeight;
-            }
-
-            // Add line break after step
-            const lineBreak = document.createElement('br');
-            stepDiv.appendChild(lineBreak);
-            
-            // Final scroll to bottom
-            canvas.scrollTop = canvas.scrollHeight;
-        }
-
-        // Utility function to create delay
+        // Utility function with better error handling
         function delay(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
+
+        // Add keyboard shortcuts for better UX
+        document.addEventListener('keydown', function(e) {
+            // Escape to clear canvas
+            if (e.key === 'Escape') {
+                const canvas = document.getElementById('canvas');
+                const questionInput = document.getElementById('questionInput');
+                canvas.classList.remove('has-content');
+                canvas.innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-comments" style="font-size: 3rem; color: var(--text-muted); margin-bottom: 20px;"></i>
+                        <p>Ready to help you learn! Ask me anything...</p>
+                        <small>Try: "Solve 2x + 5 = 13" or "How does photosynthesis work?"</small>
+                    </div>
+                `;
+                questionInput.focus();
+            }
+        });
     </script>
 </body>
 </html>
