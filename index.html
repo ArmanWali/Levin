@@ -7,9 +7,25 @@
     
     <!-- Enhanced Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">    <style>
+    <!-- MathJax for mathematical equation rendering -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: true
+            },
+            "HTML-CSS": {
+                fonts: ["TeX"]
+            }
+        });
+    </script>
+
+    <style>
         /* Professional Color Scheme Variables */
         :root {
             --primary: #2563eb;
@@ -378,12 +394,22 @@
             border-left: 4px solid #ef4444;
             margin: 10px 0;
             text-align: center;
-        }
-
-        /* Utility Classes */
+        }        /* Utility Classes */
         .text-center { text-align: center; }
         .mb-20 { margin-bottom: 20px; }
         .mt-15 { margin-top: 15px; }
+        
+        /* MathJax styling to blend with handwritten font */
+        .MathJax {
+            font-family: 'Caveat', cursive !important;
+            font-size: 24px !important;
+            color: var(--text-primary) !important;
+        }
+        
+        .MathJax_Display {
+            font-family: 'Caveat', cursive !important;
+            font-size: 26px !important;
+        }
     </style>
 </head>
 <body>    <div class="container">
@@ -447,8 +473,97 @@
             
             // Initial button state
             submitBtn.disabled = true;
-            submitBtn.style.opacity = '0.6';
-        });
+            submitBtn.style.opacity = '0.6';        });
+
+        // Helper function to prepare text for speech synthesis
+        // Converts mathematical notation to spoken equivalents
+        function prepareForSpeech(step) {
+            let spokenStep = step;
+            
+            // Replace mathematical terms with spoken equivalents
+            spokenStep = spokenStep.replace(/(\d+)x/g, '$1 x'); // 4x -> 4 x
+            spokenStep = spokenStep.replace(/\bx\b/g, 'x'); // x remains as x
+            spokenStep = spokenStep.replace(/-(\d+)/g, 'negative $1'); // -20 -> negative 20
+            spokenStep = spokenStep.replace(/\+/g, ' plus '); // + -> plus
+            spokenStep = spokenStep.replace(/(?<!\w)-(?=\w)/g, ' minus '); // - -> minus (not at start)
+            spokenStep = spokenStep.replace(/=/g, ' equals '); // = -> equals
+            spokenStep = spokenStep.replace(/\//g, ' divided by '); // / -> divided by
+            spokenStep = spokenStep.replace(/\*/g, ' times '); // * -> times
+            spokenStep = spokenStep.replace(/\^/g, ' to the power of '); // ^ -> to the power of
+            spokenStep = spokenStep.replace(/\(/g, ' open parenthesis '); // ( -> open parenthesis
+            spokenStep = spokenStep.replace(/\)/g, ' close parenthesis '); // ) -> close parenthesis
+            
+            // Clean up extra spaces
+            spokenStep = spokenStep.replace(/\s+/g, ' ').trim();
+            
+            return spokenStep;
+        }        // Helper function to wrap mathematical expressions with MathJax delimiters
+        function wrapMathWithMathJax(text) {
+            // Patterns to match different types of mathematical expressions
+            const patterns = [
+                // Equations with equals sign: 4x + 20 = 0, x = -5
+                /(\d*[a-zA-Z]?[\+\-\*\/\^\(\)\s]*[\+\-\*\/]\s*[\+\-\*\/\^\(\)0-9a-zA-Z\s]*\s*=\s*[\+\-]?[\d\w\+\-\*\/\^\(\)\s]+)/g,
+                
+                // Simple variable assignments: x = -5, y = 10
+                /(\b[a-zA-Z]\s*=\s*[\+\-]?\d+(?:\.\d+)?)/g,
+                
+                // Polynomial expressions: 4x + 20, 2x^2 + 3x - 1
+                /(\d*[a-zA-Z]\^?\d*[\+\-]\s*\d*[a-zA-Z]?\^?\d*[\+\-]?\s*\d*)/g,
+                
+                // Fractions and divisions: 4/5, -20/4
+                /([\+\-]?\d+\/\d+)/g,
+                
+                // Powers and exponents: x^2, 2^3
+                /([a-zA-Z0-9]+\^\d+)/g,
+                
+                // Simple mathematical terms: 4x, -20, 2y
+                /(\b[\+\-]?\d*[a-zA-Z]\b|\b[\+\-]?\d+\b)/g
+            ];
+            
+            let result = text;
+            
+            // Apply each pattern to wrap mathematical expressions
+            patterns.forEach(pattern => {
+                result = result.replace(pattern, (match) => {
+                    // Don't wrap if already wrapped
+                    if (match.startsWith('$') && match.endsWith('$')) {
+                        return match;
+                    }
+                    // Don't wrap simple numbers that are part of regular text
+                    if (/^\d+$/.test(match.trim()) && !text.includes('=')) {
+                        return match;
+                    }
+                    return `$${match}$`;
+                });
+            });
+            
+            // Clean up any double wrapping or malformed wrapping
+            result = result.replace(/\$+([^$]+)\$+/g, '$$$1$$');
+            result = result.replace(/\$\$/g, '$');
+            
+            return result;
+        }
+
+        // Function to speak text using Web Speech API
+        function speakText(text) {
+            // Check if speech synthesis is supported
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+                
+                // Create new speech utterance
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Configure speech settings for clear math narration
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9; // Slightly slower for clarity
+                utterance.pitch = 1; // Natural tone
+                utterance.volume = 1; // Full volume
+                
+                // Speak the text
+                window.speechSynthesis.speak(utterance);
+            }
+        }
 
         // Enhanced submit function with better UX
         async function submitQuestion() {
@@ -585,9 +700,7 @@
                 </div>
             `;
             canvas.appendChild(completionDiv);
-        }
-
-        // Enhanced step animation with better visual feedback
+        }        // Enhanced step animation with MathJax and voice narration
         async function displayStepChunkByChunk(step, stepIndex) {
             const canvas = document.getElementById('canvas');
             
@@ -615,8 +728,24 @@
             const contentSpan = document.createElement('span');
             stepDiv.appendChild(contentSpan);
 
-            // Enhanced character-by-character animation
-            await animateTextCharacterByCharacter(contentSpan, step);
+            // Wrap mathematical expressions with MathJax delimiters for display
+            const mathFormattedStep = wrapMathWithMathJax(step);
+
+            // Enhanced character-by-character animation with MathJax support
+            await animateTextCharacterByCharacterWithMath(contentSpan, mathFormattedStep);
+
+            // Render MathJax equations after all text is displayed
+            if (typeof MathJax !== 'undefined' && MathJax.Hub) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, stepDiv]);
+            }
+
+            // Prepare text for speech (without MathJax delimiters)
+            const speechText = `Step ${stepIndex + 1}: ${prepareForSpeech(step)}`;
+            
+            // Wait a moment for MathJax rendering, then speak
+            setTimeout(() => {
+                speakText(speechText);
+            }, 500);
 
             // Add spacing
             const lineBreak = document.createElement('br');
@@ -627,9 +756,82 @@
                 top: canvas.scrollHeight,
                 behavior: 'smooth'
             });
+        }        // Enhanced character animation with MathJax support
+        async function animateTextCharacterByCharacterWithMath(container, text) {
+            // Split text while preserving MathJax delimiters
+            const parts = text.split(/(\$[^$]+\$)/);
+            
+            for (let partIndex = 0; partIndex < parts.length; partIndex++) {
+                const part = parts[partIndex];
+                
+                if (part.startsWith('$') && part.endsWith('$')) {
+                    // This is a mathematical expression - add it as a whole
+                    const mathSpan = document.createElement('span');
+                    mathSpan.textContent = part;
+                    mathSpan.className = 'handwriting-word';
+                    mathSpan.style.opacity = '1';
+                    container.appendChild(mathSpan);
+                    
+                    // Brief pause for math expressions
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                } else {
+                    // Regular text - animate character by character
+                    const words = part.split(' ').filter(word => word.length > 0);
+                    
+                    for (let wordIndex = 0; wordIndex < words.length; wordIndex++) {
+                        const word = words[wordIndex];
+                        
+                        // Create word container
+                        const wordSpan = document.createElement('span');
+                        wordSpan.className = 'handwriting-word';
+                        wordSpan.style.opacity = '1';
+                        container.appendChild(wordSpan);
+                        
+                        // Animate each character with natural variation
+                        for (let charIndex = 0; charIndex < word.length; charIndex++) {
+                            const char = word[charIndex];
+                            const charSpan = document.createElement('span');
+                            charSpan.className = 'handwriting-char';
+                            charSpan.textContent = char;
+                            charSpan.style.animationDelay = `${charIndex * 0.03}s`;
+                            wordSpan.appendChild(charSpan);
+                            
+                            // Natural variation in timing
+                            const baseDelay = 40;
+                            const variation = Math.random() * 30;
+                            await new Promise(resolve => setTimeout(resolve, baseDelay + variation));
+                        }
+                        
+                        // Add natural space between words
+                        if (wordIndex < words.length - 1) {
+                            const spaceSpan = document.createElement('span');
+                            spaceSpan.textContent = ' ';
+                            spaceSpan.style.opacity = '1';
+                            container.appendChild(spaceSpan);
+                            
+                            // Slight pause between words
+                            await new Promise(resolve => setTimeout(resolve, 80 + Math.random() * 40));
+                        }
+                    }
+                }
+                
+                // Add space between parts if needed
+                if (partIndex < parts.length - 1 && !parts[partIndex + 1].startsWith('$')) {
+                    const spaceSpan = document.createElement('span');
+                    spaceSpan.textContent = ' ';
+                    spaceSpan.style.opacity = '1';
+                    container.appendChild(spaceSpan);
+                }
+                
+                // Smooth auto-scroll during animation
+                container.parentElement.parentElement.scrollTo({
+                    top: container.parentElement.parentElement.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
         }
 
-        // Enhanced character animation with natural variation
+        // Legacy function - keeping for compatibility but not used with MathJax
         async function animateTextCharacterByCharacter(container, text) {
             const words = text.split(' ');
             
@@ -642,7 +844,7 @@
                 wordSpan.style.opacity = '1';
                 container.appendChild(wordSpan);
                 
-                // Animate each character with natural variation
+                // Animate each character with natural variation  
                 for (let charIndex = 0; charIndex < word.length; charIndex++) {
                     const char = word[charIndex];
                     const charSpan = document.createElement('span');

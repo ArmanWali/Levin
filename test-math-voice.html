@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Voice Test</title>
+    
+    <!-- MathJax -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+    <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            tex2jax: {
+                inlineMath: [['$', '$']],
+                displayMath: [['$$', '$$']],
+                processEscapes: true
+            }
+        });
+    </script>
+    
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>Testing Math Voice Narration</h1>
+    
+    <button onclick="testMathSpeech()">Test Math Speech</button>
+    <button onclick="testMathJax()">Test MathJax</button>
+    
+    <div id="results"></div>
+    
+    <script>
+        // Test functions from main app
+        function prepareForSpeech(step) {
+            let spokenStep = step;
+            
+            spokenStep = spokenStep.replace(/(\d+)x/g, '$1 x');
+            spokenStep = spokenStep.replace(/\bx\b/g, 'x');
+            spokenStep = spokenStep.replace(/-(\d+)/g, 'negative $1');
+            spokenStep = spokenStep.replace(/\+/g, ' plus ');
+            spokenStep = spokenStep.replace(/(?<!\w)-(?=\w)/g, ' minus ');
+            spokenStep = spokenStep.replace(/=/g, ' equals ');
+            spokenStep = spokenStep.replace(/\//g, ' divided by ');
+            spokenStep = spokenStep.replace(/\*/g, ' times ');
+            spokenStep = spokenStep.replace(/\^/g, ' to the power of ');
+            spokenStep = spokenStep.replace(/\(/g, ' open parenthesis ');
+            spokenStep = spokenStep.replace(/\)/g, ' close parenthesis ');
+            
+            spokenStep = spokenStep.replace(/\s+/g, ' ').trim();
+            
+            return spokenStep;
+        }
+        
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+        
+        function testMathSpeech() {
+            const testCases = [
+                "The equation 4x + 20 = 0 simplifies to 4x = -20",
+                "Divide both sides by 4 to get x = -5",
+                "Substitute x = -5 into the original equation",
+                "The quadratic formula is x = (-b ± √(b^2 - 4ac)) / 2a"
+            ];
+            
+            const results = document.getElementById('results');
+            results.innerHTML = '<h3>Speech Test Results:</h3>';
+            
+            testCases.forEach((testCase, index) => {
+                const spoken = prepareForSpeech(testCase);
+                const div = document.createElement('div');
+                div.className = 'test-result';
+                div.innerHTML = `
+                    <strong>Original:</strong> ${testCase}<br>
+                    <strong>Speech:</strong> ${spoken}<br>
+                    <button onclick="speakText('Step ${index + 1}: ${spoken}')">🔊 Play</button>
+                `;
+                results.appendChild(div);
+            });
+        }
+        
+        function testMathJax() {
+            const testMath = [
+                "$4x + 20 = 0$",
+                "$x = -5$",
+                "$x^2 + 3x - 4 = 0$",
+                "$\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}$"
+            ];
+            
+            const results = document.getElementById('results');
+            const mathDiv = document.createElement('div');
+            mathDiv.innerHTML = '<h3>MathJax Test:</h3>';
+            
+            testMath.forEach(math => {
+                const div = document.createElement('div');
+                div.className = 'test-result';
+                div.innerHTML = `Rendered: ${math}`;
+                mathDiv.appendChild(div);
+            });
+            
+            results.appendChild(mathDiv);
+            
+            // Re-render MathJax
+            if (typeof MathJax !== 'undefined' && MathJax.Hub) {
+                MathJax.Hub.Queue(["Typeset", MathJax.Hub, mathDiv]);
+            }
+        }
+    </script>
+</body>
+</html>
